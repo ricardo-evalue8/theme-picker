@@ -15,7 +15,7 @@ v1.0.0 - stable
 
 ## Changelog
 
-* alpha v1.0.0 - Does not work yet *
+* alpha v1.0.0 - Does not work yet
 
 ## TODO
 * Change theme when click button

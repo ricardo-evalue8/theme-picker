@@ -1,0 +1,24 @@
+# CSS File
+# Un-comment this to use a custom CSS stylesheet for the login page.
+# css_url: /theme/myTheme/css/login-theme.css
+#
+# Image URL
+#   You can reference a local file (stored in your theme, for example) like so:
+#   image_url: /public/theme/myTheme/assets/images/login-background.jpg
+#
+# OR
+#   reference a file somewhere out on the Internet.
+#   (I recommend Unsplash, but that's just me.)
+#
+#   Use the source.unsplash.com API to pull a random image
+#   or a weekly image by search term, etc.
+#
+#   Random featured image with tag "nature" and size 1600x900
+#   image_url: https://source.unsplash.com/featured/1600x900/?nature
+#
+#   Random 1200x700 image from Peter Broomfield's "Vibrant/Colorful" collection
+#   image_url: https://source.unsplash.com/collection/1140715/1200x700
+# 
+#   Default: A super-cool ocean photo from Unsplash
+#   (Photo by Matt Hardy): https://unsplash.com/@matthardy
+image_url: https://source.unsplash.com/6ArTTluciuA/1600x900

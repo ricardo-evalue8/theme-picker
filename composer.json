@@ -1,0 +1,42 @@
+{
+    "name": "evalue8/themepicker",
+    "description": "This extension will change the background of the login page.",
+    "type": "bolt-extension",
+	"version": "1.0.0",
+    "keywords": ["login", "admin", "theme", "background", "image"],
+    "require": {
+        "bolt/bolt": "^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.7"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ricardo van de Rakt",
+            "email": "ricardo@evalue8.nl",
+			"homepage": "http://evalue8.nl"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "Bolt\\Extension\\evalue8\\themepicker\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Bolt\\Extension\\evalue8\\themepicker\\Tests\\": "tests",
+            "Bolt\\Tests\\": "vendor/bolt/bolt/tests/phpunit/unit/"
+        }
+    },
+    "extra": {
+		"bolt-icon": "themepicker.png",
+        "bolt-assets": "web",
+        "bolt-class": "Bolt\\Extension\\evalue8\\themepicker\\themepickerExtension",
+		"bolt-screenshots": [
+            "/assets/screenshot1.png"
+        ]
+	}
+}
