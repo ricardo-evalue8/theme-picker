@@ -8,6 +8,13 @@ use Bolt\Asset\File\Stylesheet;
 use Bolt\Controller\Zone;
 use Bolt\Asset\Target;
 
+use Bolt\Menu\MenuEntry;
+use Bolt\Menu\AdminMenuBuilder;
+use Silex\Application;
+use Silex\ControllerCollection;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
 /**
  * An extremely basic (thus far) login wallpaper extension.
  *
@@ -17,44 +24,86 @@ use Bolt\Asset\Target;
  */
 class themepickerExtension extends SimpleExtension
 {
-  /**
-   * {@inheritdoc}
-   */
-  protected function registerAssets() {
-    $config = $this->getConfig();
+	protected function registerMenuEntries()
+	{
+		$menu = MenuEntry::create('theme-menu', 'theme')
+			->setLabel('Theme Picker')
+			->setIcon('fa:paint-brush')
+			->setPermission('settings')
+		;
+		
+		$submenuItemOne = MenuEntry::create('theme-submenu-one', '../../theme-picker')
+			->setLabel('Select theme')
+			->setIcon('fa:paint-brush')
+		;
 
-    if ( $config["css_url"] ) {
-      $asset = Stylesheet::Create()
-                  ->setPath($config["css_url"])
-                  ->setZone(Zone::BACKEND)
-                  ->setLocation(Target::AFTER_META);
-    } else {
-      $asset = Snippet::Create()
-                  ->setCallback([$this, 'printWallpaperSnippet'])
-                  ->setZone(Zone::BACKEND)
-                  ->setLocation(Target::AFTER_META);
+		$submenuItemTwo = MenuEntry::create('theme-submenu-two', '../../theme-upload')
+			->setLabel('Upload theme')
+			->setIcon('fa:upload')
+		;
 
+		$menu->add($submenuItemOne);
+		$menu->add($submenuItemTwo);
+
+		return [
+			$menu,
+		];
+	}
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function registerBackendRoutes(ControllerCollection $collection)
+    {
+        // GET requests on the /bolt/theme-picker route
+        $collection->get('/theme-picker', [$this, 'callbackBoltPicker']);
+
+        // POST requests on the /bolt/theme-picker route
+        $collection->post('/theme-picker', [$this, 'callbackBoltPicker']);
+		
+		// GET requests on the /bolt/theme-picker route
+        $collection->get('/theme-upload', [$this, 'callbackBoltUpload']);
+
+        // POST requests on the /bolt/theme-picker route
+        $collection->post('/theme-upload', [$this, 'callbackBoltUpload']);
     }
-    return [ $asset ];
-  }
 
-  public function printWallpaperSnippet() {
-    $config = $this->getConfig();
-
-    return '<style>
-    body.login {
-      background: url("' . $config["image_url"] . '") no-repeat center center /cover;
+    /**
+     * @param Application $app
+     * @param Request     $request
+     *
+     * @return Response
+     */
+    public function callbackBoltPicker(Application $app, Request $request)
+    {
+        return $this->renderTemplate('theme-picker.twig');
     }
-    </style>';
-  }
+	public function callbackBoltUpload(Application $app, Request $request)
+    {
+        return $this->renderTemplate('theme-upload.twig');
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function getDefaultConfig() {
-    return [
-      'image_url'  => 'https://source.unsplash.com/6ArTTluciuA/1600x900',
-      'css_url'    => ''
-    ];
-  }
+    /**
+     * @param Application $app
+     * @param Request     $request
+     *
+     * @return Response
+     */
+    public function callbackKoalaAdmin(Application $app, Request $request)
+    {
+        if ($request->isMethod('POST')) {
+            // Handle the POST data
+            return new Response('Thanks, Kenny', Response::HTTP_OK);
+        }
+
+        return new Response('Welcome to your admin page, Kenny', Response::HTTP_OK);
+    }
+	
+	protected function registerAssets()
+    {
+        // Add some web assets from the web/ directory
+        return [
+            new Stylesheet('card.css'),
+        ];
+    }
 }

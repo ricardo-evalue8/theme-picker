@@ -2,7 +2,6 @@
     "name": "evalue8/themepicker",
     "description": "This extension will callow you to hange theme by clicking the buttons.",
     "type": "bolt-extension",
-	"version": "1.0.0",
     "keywords": ["login", "admin", "theme", "background", "image"],
     "require": {
         "bolt/bolt": "^3.0"
