@@ -1,5 +1,5 @@
 # themepicker
-This extension will change the login background image.
+ Change theme by clicking on the select theme button.
 ![Bolt screenshot](https://github.com/ricardo-evalue8/theme-picker/blob/master/assets/screenshot1.png?raw=true)
 
 Extension version
