@@ -1,6 +1,6 @@
 # themepicker
 This extension will change the login background image.
-![Bolt login screen with ocean background](https://github.com/ricardo-evalue8/themepicker/blob/master/assets/screenshot1.png?raw=true)
+![Bolt screenshot](https://github.com/ricardo-evalue8/theme-picker/blob/master/assets/screenshot1.png?raw=true)
 
 Extension version
 ```
