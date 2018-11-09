@@ -4,7 +4,7 @@
 
 Extension version
 ```
-v1.0.0 - stable
+v1.0.0 - alpha
 ```
 
 ## Setup
