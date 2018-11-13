@@ -1,14 +1,19 @@
 
-{% extends '_base/_page-nav.twig' %}
+{% extends '_base/_page-nav-no-omnisearch.twig' %}
 {% block page_nav 'Theme picker' %}
 {% block page_title 'Theme picker' %}
 {% block page_main %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <link rel="stylesheet" href="{{ asset('css/card.css', 'theme') }}">
-	<link rel="stylesheet" href="{{ asset('css/card.css', 'theme') }}">
-</head>
+
+
+{# Check logged in #}
+{% if user.username %}
+	{# Nothing #}
+{% else %}
+	{# Redirect to login page #}
+		<script>
+			window.location.replace("{{ path('login') }}");
+		</script>
+{% endif %}
 
 {# Template picker #}
 {#<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">#}
@@ -16,32 +21,115 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 
-{% set themes = {'theme2': 'base-2016', 'theme3': 'skeleton', 'theme4': 'test'} %}
-{% set themesInfo = {'info2': 'test2', 'info3': 'test3', 'info4': 'test4'} %}
 
-<div class="container">
+<style>
 
-  <!-- Modal -->
+.mb-5 {
+	margin-bottom: 5rem!important;
+}
+
+.card {
+    position: relative;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+}
+
+.card-img-top {
+    width: 100%;
+    border-top-left-radius: calc(.25rem - 1px);
+    border-top-right-radius: calc(.25rem - 1px);
+}
+
+.card-body {
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 1.25rem;
+}
+
+.card-title {
+    margin-bottom: .75rem;
+}
+
+.card-footer {
+    padding: .75rem 1.25rem;
+    background-color: rgba(0,0,0,.03);
+    border-top: 1px solid rgba(0,0,0,.125);
+}
+
+.image {
+	min-height: 197.41px;
+	max-height: 197.41px;
+}
+
+.card-title {
+	font-size: 2rem;
+	font-weight: bold;
+}
+
+.card-text {
+	font-size: 1.5rem;
+}
+
+.btn {
+	font-size: 1.5rem;
+}
+
+/* test */
+.modal-title {
+    margin-bottom: 0;
+    line-height: 1.5;
+	font-size: 3rem;
+	font-weight: bold;
+}
+
+.modal-image {
+	min-height: 200px!important;
+	max-height: 200px!important;
+    min-width: 400px!important;
+    max-width: 400px!important;
+}
+
+#theme-modal-text {
+	font-size: 1.7rem;
+}
+
+
+.float-left {
+	float: left;
+}
+
+.show-button {
+	margin-bottom: 5px;
+}
+</style>
+<div class="col-md-9">
+
+	<!-- Modal -->
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">Confirm new theme</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
         </div>
         <div class="modal-body">
           <p id="modal-text"></p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-          <button type="button" class="btn btn-primary" onclick="selectTheme()">Yes</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+          <button id="change" type="button" class="btn btn-primary">Yes</button>
+					<div id="change">test</div>
         </div>
       </div>
     </div>
   </div>
-
 
   <!-- Modal -->
   <div class="modal fade bd-example-modal-lg" id="themeModal" tabindex="-1" role="dialog" aria-labelledby="themeModalCenterTitle" aria-hidden="true">
@@ -49,31 +137,38 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="themeModalLongTitle"></h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
         </div>
         <div class="modal-body">
           <p id="theme-modal-text"></p>
+					<br><br>
           <div class="row">
-            <div class="col-6">
-              <img id="image1" class="card-img-top" alt="{{ value }} image" style="max-height: 183.563px;">
+            <div id="image-container" class="col-md-6">
+              <img id="image1" class="card-img-top modal-image" alt="{{ value }} image" style="max-height: 183.563px;" onerror="noImage()">
             </div>
-            <div class="col-6">
-              <img id="image2" class="card-img-top" alt="{{ value }} image" style="max-height: 183.563px;">
+
+            <div class="col-md-6">
+							<h2 style="margin-top: 0px;">pages</h2>
+							<a href="/theme/home" class="btn btn-primary show-button" target="_blank" >Home</a><br>
+							<a href="/theme/about-us" class="btn btn-primary show-button" target="_blank">About Us</a><br>
+							<a href="/theme/contact" class="btn btn-primary show-button" target="_blank">Contact</a><br>
+							<a href="/theme/pricing" class="btn btn-primary show-button" target="_blank">Pricing</a><br>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			<div class="float-left">
+
+			</div>
+
+			<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- cards -->
-  <div class="row">
-    <div class="col-4">
+	<!-- Card | Active theme -->
+	<div class="col-md-4">
+
       <div class="card">
         <img class="card-img-top image" src="/theme/{{ config.get('general/theme') }}/theme.png" alt="Card image cap">
           <div class="card-body">
@@ -87,26 +182,62 @@
       </div>
     </div>
 
-    {% for key,value in themes %}
-    <div class="col-4 mb-5">
+	<!-- Card | Other themes -->
+
+	{% for name,value in theme %}
+    <div class="col-md-4 mb-5">
       <div class="card">
-        <img class="card-img-top" src="/theme/{{ value }}/theme.png" alt="{{ value }} image" style="max-height: 183.563px;" onerror="this.src='../..//files/main/no-image.png';">
+        <img class="card-img-top image" src="/theme/{{ value }}/theme.png" alt="{{ value }} image" onerror="this.src='../..//files/main/no-image.png';">
           <div class="card-body">
               <h5 class="card-title">{{ value }}</h5>
             <p class="card-text">{{ theme.info }}</p>
           </div>
           <div class="card-footer text-center">
-              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" value="{{ value }}" onclick="data(this)">Select theme</button>
+              <button type="button" class="btn btn-primary" value="{{ value }}" onclick="location.href = '?theme=' + this.value;">Select theme</button>
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#themeModal" value="{{ value }}" onclick="theme(this)">Theme info</button>
           </div>
       </div>
     </div>
     {% endfor %}
 
-  </div>
+</div>
+<aside class="col-md-3">
+
+
+
+<div class="panel panel-default panel-news">
+
+	<div class="panel-heading">
+		<i class="fa fa-info"></i>
+		Select theme
+	</div>
+
+	<div class="panel-body">
+
+	<div class="description">
+	</div>
+		<ul>
+			<li>Click theme info to show the theme</li>
+			<li>Click on Select theme to select the theme for your website</li>
+		</ul>
+	</div>
 </div>
 
+</aside>
+
+
 <script>
+// If there is no image hide image container
+function noImage(image) {
+	document.getElementById("image-container").style.display = "none";
+	document.getElementById("image1").style.display = "none";
+}
+// Reset image container when close modal
+$('#themeModal').on('hidden.bs.modal', function () {
+	document.getElementById("image-container").style.display = "block";
+    document.getElementById("image1").style.display = "block";
+})
+
 // Get folder for images
 // OnLoad
 document.getElementById("theme-modal-text").innerHTML = "No theme info found";
@@ -122,8 +253,8 @@ function theme(e) {
   var image = document.getElementById("image1");
   image.src = "/theme/" + value  + "/theme.png";
 
-  var image2 = document.getElementById("image2");
-  image2.src = "/theme/" + value  + "/screenshots/screenshot1.png";
+  //var image2 = document.getElementById("image2");
+  //image2.src = "/theme/" + value  + "/screenshots/screenshot1.png";
 
 
   // Title
@@ -153,6 +284,21 @@ $("#themeModal").on("hidden.bs.modal", function () {
 function selectTheme() {
   alert("Not ready yet");
 }
+
+var fs = require('fs');
+var path = '/';
+var filenames = fs.readdirSync(path);
+var count = 0;
+filenames.forEach(function (name) {
+    if (name === "." || name === "..") {
+        return;
+    }
+    if (fs.lstatSync(path + "/" + name).isDirectory()) {
+        count++;
+    }
+
+});
+console.log(count);
 </script>
 
 {% endblock %}

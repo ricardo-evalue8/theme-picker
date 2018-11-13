@@ -15,6 +15,11 @@ use Silex\ControllerCollection;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Yaml;
+//use Bolt\Configuration\YamlUpdater;
+
+
 /**
  * An extremely basic (thus far) login wallpaper extension.
  *
@@ -31,7 +36,7 @@ class themepickerExtension extends SimpleExtension
 			->setIcon('fa:paint-brush')
 			->setPermission('settings')
 		;
-		
+
 		$submenuItemOne = MenuEntry::create('theme-submenu-one', '../../theme-picker')
 			->setLabel('Select theme')
 			->setIcon('fa:paint-brush')
@@ -60,7 +65,7 @@ class themepickerExtension extends SimpleExtension
 
         // POST requests on the /bolt/theme-picker route
         $collection->post('/theme-picker', [$this, 'callbackBoltPicker']);
-		
+
 		// GET requests on the /bolt/theme-picker route
         $collection->get('/theme-upload', [$this, 'callbackBoltUpload']);
 
@@ -76,9 +81,59 @@ class themepickerExtension extends SimpleExtension
      */
     public function callbackBoltPicker(Application $app, Request $request)
     {
-        return $this->renderTemplate('theme-picker.twig');
+
+			//echo $_SERVER['HTTP_HOST'] . "/bolt";
+			//print_r($_SERVER);
+			if (isset($_GET['theme']) && !empty($_GET['theme'])) {
+				$file = $_SERVER['DOCUMENT_ROOT'] . '/../app/config/config.yml';
+
+				$yaml = Yaml::parse(file_get_contents($file));
+				$yaml['theme'] = $_GET['theme'];
+				$new_yaml = Yaml::dump($yaml);
+				file_put_contents($file, $new_yaml);
+
+				// Reload page (Theme-picker)
+				header("Location: " . "http://" .  $_SERVER['HTTP_HOST'] . $_SERVER['REDIRECT_URL']);
+
+				// Wait 5 seconds
+				sleep(5);
+
+				exit;
+			}
+
+			// Get themes from theme folder
+			$folders = array_slice(scandir('theme/'), 2);
+
+			// Delete from array function
+			function deleteElement($element, &$array){
+			    $index = array_search($element, $array);
+			    if($index !== false){
+			        unset($array[$index]);
+			    }
+			}
+
+			// Read config file
+			$yaml = new Parser();
+			$config_load = $yaml->parse(file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/../app/config/config.yml'));
+
+			// Get active theme from config
+			$active_theme = $config_load['theme'];
+
+			// Delete active theme from themes array
+			deleteElement($active_theme, $folders);
+
+			// Themes array to twig
+			$themes = [
+				'theme' => $folders,
+			];
+
+			$success = false;
+
+
+			return $this->renderTemplate('theme-picker.twig', $themes);
     }
-	public function callbackBoltUpload(Application $app, Request $request)
+
+		public function callbackBoltUpload(Application $app, Request $request)
     {
         return $this->renderTemplate('theme-upload.twig');
     }
@@ -98,12 +153,50 @@ class themepickerExtension extends SimpleExtension
 
         return new Response('Welcome to your admin page, Kenny', Response::HTTP_OK);
     }
-	
-	protected function registerAssets()
+
+		protected function registerAssets()
     {
         // Add some web assets from the web/ directory
         return [
             new Stylesheet('card.css'),
         ];
+    }
+
+
+		// Set new active theme
+		public function setTheme($theme)
+    {
+			$file = $_SERVER['DOCUMENT_ROOT'] . '/../app/config/config.yml';
+
+			$yaml = Yaml::parse(file_get_contents($file));
+			$srcData = $yaml['theme'];
+			//echo $srcData;
+			$yaml['theme'] = $theme;
+			$new_yaml = Yaml::dump($yaml);
+			file_put_contents($file, $new_yaml);
+    }
+
+
+		// Create twig function from php functions
+    protected function registerTwigFunctions()
+    {
+        return [
+            'card_css_file' => 'cardCssFile',
+						'set_theme' => 'setTheme',
+        ];
+    }
+
+    /**
+     * The callback function when {{ card_css_file() }} is used in a template.
+     *
+     * @return string
+     */
+    public function cardCssFile()
+    {
+        $context = [
+            'something' => mt_rand(),
+        ];
+
+        return $this->renderTemplate('extension.twig', $context);
     }
 }
