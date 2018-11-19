@@ -35,20 +35,31 @@ class themepickerExtension extends SimpleExtension
 			->setLabel('Theme Picker')
 			->setIcon('fa:paint-brush')
 			->setPermission('settings')
+			->setRoute('select-theme')
 		;
 
-		$submenuItemOne = MenuEntry::create('theme-submenu-one', '../../theme-picker')
+		$submenuItemOne = MenuEntry::create('theme-submenu-one', '../theme-picker')
 			->setLabel('Select theme')
 			->setIcon('fa:paint-brush')
+			->setPermission('useraction')
 		;
 
-		$submenuItemTwo = MenuEntry::create('theme-submenu-two', '../../theme-upload')
+		$submenuItemTwo = MenuEntry::create('theme-submenu-two', '../theme-toggle')
+			->setLabel('Enable / Disable themes')
+			->setIcon('fa:toggle-on')
+			->setPermission('upload_theme')
+		;
+
+		$submenuItemThree = MenuEntry::create('theme-submenu-three', '../theme-upload')
 			->setLabel('Upload theme')
 			->setIcon('fa:upload')
+			->setPermission('upload_theme')
 		;
+
 
 		$menu->add($submenuItemOne);
 		$menu->add($submenuItemTwo);
+		$menu->add($submenuItemThree);
 
 		return [
 			$menu,
@@ -60,13 +71,22 @@ class themepickerExtension extends SimpleExtension
      */
     protected function registerBackendRoutes(ControllerCollection $collection)
     {
+				// Theme select
         // GET requests on the /bolt/theme-picker route
         $collection->get('/theme-picker', [$this, 'callbackBoltPicker']);
 
         // POST requests on the /bolt/theme-picker route
         $collection->post('/theme-picker', [$this, 'callbackBoltPicker']);
 
-		// GET requests on the /bolt/theme-picker route
+				// Theme enable / disable
+				// GET requests on the /bolt/theme-picker route
+        $collection->get('/theme-toggle', [$this, 'callbackBoltToggle']);
+
+        // POST requests on the /bolt/theme-picker route
+        $collection->post('/theme-toggle', [$this, 'callbackBoltToggle']);
+
+				// Theme upload
+				// GET requests on the /bolt/theme-picker route
         $collection->get('/theme-upload', [$this, 'callbackBoltUpload']);
 
         // POST requests on the /bolt/theme-picker route
@@ -133,9 +153,87 @@ class themepickerExtension extends SimpleExtension
 			return $this->renderTemplate('theme-picker.twig', $themes);
     }
 
+		// Theme Enable / disable
+		public function callbackBoltToggle(Application $app, Request $request)
+    {
+
+			if (isset($_GET['theme']) && !empty($_GET['theme'])) {
+				$file = $_SERVER['DOCUMENT_ROOT'] . '/../app/config/config.yml';
+
+				$yaml = Yaml::parse(file_get_contents($file));
+				$yaml['theme'] = $_GET['theme'];
+				$new_yaml = Yaml::dump($yaml);
+				file_put_contents($file, $new_yaml);
+
+				// Reload page (Theme-picker)
+				header("Location: " . "http://" .  $_SERVER['HTTP_HOST'] . $_SERVER['REDIRECT_URL']);
+
+				// Wait 5 seconds
+				sleep(5);
+
+				exit;
+			}
+
+			// Get themes from theme folder
+			$folders = array_slice(scandir('theme/'), 2);
+
+			// Delete from array function
+			function deleteElement($element, &$array){
+			    $index = array_search($element, $array);
+			    if($index !== false){
+			        unset($array[$index]);
+			    }
+			}
+
+			// Read config file
+			$yaml = new Parser();
+			$config_load = $yaml->parse(file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/../app/config/config.yml'));
+
+			// Get active theme from config
+			$active_theme = $config_load['theme'];
+
+			// Delete active theme from themes array
+			deleteElement($active_theme, $folders);
+
+			// Get active Themes
+			$file = $_SERVER['DOCUMENT_ROOT'] . '/theme/base-2018/state.txt';
+
+			// Create array for twig
+			$statuses = array();
+			foreach ($folders as $states) {
+					$file = $_SERVER['DOCUMENT_ROOT'] . '/theme/' . $states . '/state.txt';
+
+					$myfile = fopen($file, "r") or die("Unable to open file!");
+					$state =  fread($myfile,filesize($file));
+					$statuses[$states] = $state;
+					//array_push($statuses, $state);
+					fclose($myfile);
+			}
+
+			// Themes array to twig
+			$themes = [
+				'theme' => $statuses,
+			];
+
+			return $this->renderTemplate('theme-toggle.twig', $themes);
+    }
+
+		// Theme upload
 		public function callbackBoltUpload(Application $app, Request $request)
     {
-        return $this->renderTemplate('theme-upload.twig');
+			$file = $_SERVER['DOCUMENT_ROOT'] . 'extensions/vendor/evalue8/themepicker/templates/upload.php';
+
+			$replace = array("public_html");
+			$file = str_replace($replace, "", $file);
+
+			echo $file . '<br>';
+			$action = [
+		    'action' => $file,
+			];
+
+			return $this->renderTemplate('theme-upload.twig', $action);
+
+			//return $this->renderTemplate('theme-upload.twig', $action);
     }
 
     /**
@@ -156,10 +254,20 @@ class themepickerExtension extends SimpleExtension
 
 		protected function registerAssets()
     {
-        // Add some web assets from the web/ directory
-        return [
-            new Stylesheet('card.css'),
-        ];
+			$asset = Stylesheet::create()
+			->setFileName('koala.css')
+			->setLate(true)
+			->setPriority(5)
+			->setZone(Zone::BACKEND)
+			;
+
+			return [
+					$asset,
+			];
+      // Add some web assets from the web/ directory
+      return [
+          new Stylesheet('card.css'),
+      ];
     }
 
 

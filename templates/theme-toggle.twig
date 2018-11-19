@@ -1,0 +1,136 @@
+
+{% extends '_base/_page-nav-no-omnisearch.twig' %}
+{% block page_nav 'Theme picker' %}
+{% block page_title 'Theme picker' %}
+{% block page_main %}
+
+
+{# Check logged in #}
+{% if user.username %}
+	{# Nothing #}
+{% else %}
+	{# Redirect to login page #}
+		<script>
+			window.location.replace("{{ path('login') }}");
+		</script>
+{% endif %}
+<style>
+	.btn-disable {
+		background-color: #cb2a2a;
+		border-color: #ba2727;
+		color: #FFF!important;
+	}
+</style>
+{# Theme Enable / Disable #}
+
+<link rel="stylesheet" href="/../extensions/themepicker/web/card.css" />
+
+<div class="col-md-9">
+
+	<!-- Card | Other themes -->
+
+	{% for theme, state in theme %}
+    <div class="col-md-4 mb-5">
+
+      <div class="card">
+        <img class="card-img-top image" src="/theme/{{ theme }}/theme.png" alt="{{ theme }} image" onerror="this.src='../..//files/main/no-image.png';">
+          <div class="card-body">
+						<h5 class="card-title">{{ theme }}</h5>
+            <p class="card-text">{{ theme.info }}</p>
+          </div>
+          <div class="card-footer text-center">
+						{% if state == 'enabled' %}
+							<button id="{{ theme }}" type="button" class="btn btn-disable" data-toggle="modal" data-target="#themeModal" value="{{ theme }}" onclick="disable(this.value)">Disable theme</button>
+						{% else %}
+						<button id="{{ theme }}" type="button" class="btn btn-primary" value="{{ theme }}" onclick="enable(this.value)">Enable theme</button>
+						{% endif %}
+          </div>
+      </div>
+    </div>
+    {% endfor %}
+
+</div>
+<aside class="col-md-3">
+
+
+
+<div class="panel panel-default panel-news">
+
+	<div class="panel-heading">
+		<i class="fa fa-info"></i>
+		&nbsp;Enabled / Disabled
+	</div>
+
+	<div class="panel-body">
+
+	<div class="description">
+	</div>
+		<ul>
+			<p>Enabled themes</p>
+			<li>Will be showing on the select theme page</li>
+			<br>
+			<p>Disabled themes</p>
+			<li>Will not be showing on the select theme page</li>
+
+		</ul>
+	</div>
+</div>
+
+</aside>
+
+<script>
+
+	function enable(theme) {
+
+		var element = document.getElementById(theme);
+		element.classList.remove("btn-primary");
+		element.classList.add("btn-disable");
+		element.firstChild.data = "Disable theme";
+
+	}
+
+	function disable(theme) {
+		var element = document.getElementById(theme);
+		element.classList.remove("btn-disable");
+		element.classList.add("btn-primary");
+		element.firstChild.data = "Enable theme";
+	}
+	function disables(theme) {
+
+		var element = document.getElementById(theme);
+		element.classList.remove("btn-disable");
+		element.classList.add("btn-primary");
+		element.firstChild.data = "Enable theme";
+
+
+		//
+		var test = "/../theme/" + theme + "/test.txt";
+
+
+		var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", test, false);
+    rawFile.onreadystatechange = function ()
+    {
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+
+                var allText = rawFile.responseText;
+                var data = allText;
+								alert(data);
+								rawFile.write("tests");
+            }
+        }
+    }
+
+    rawFile.send(null);
+
+
+	}
+
+
+</script>
+
+
+{% endblock %}
