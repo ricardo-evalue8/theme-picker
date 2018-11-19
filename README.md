@@ -24,8 +24,6 @@ upload_theme: [ developer ]
 
 Fils required per theme
 
-| File | location |
-| ------ | ------ |
 | File | location | Info |
 | ------ | ------ | ------ |
 | theme | [theme/*themename*/theme.png] | Theme screenshot |
